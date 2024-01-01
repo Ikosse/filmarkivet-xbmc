@@ -13,7 +13,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import sys, os, xbmc, xbmcaddon, xbmcgui, xbmcplugin, xbmcvfs
+import sys
+import os
+import xbmc
+import xbmcaddon
+import xbmcgui
+import xbmcplugin
+import xbmcvfs
 
 
 class AddonUtils():

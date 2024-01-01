@@ -13,8 +13,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import sys, requests
-import xbmcgui, xbmcplugin
+import sys
+import requests
+import xbmcgui
+import xbmcplugin
 from resources.lib.filmarkivet import Filmarkivet
 from resources.lib.kodiutils import AddonUtils, keyboard_get_string
 from urllib.parse import parse_qs
@@ -37,7 +39,9 @@ def run():
             if mode == "categories":
                 addon_utils.view_menu(fa.get_categories())
             if mode == "category" and url:
-                movies = fa.get_url_movies(url, mode="category", page=page, limit=True)
+                movies = fa.get_url_movies(
+                    url, mode="category", page=page, limit=True
+                )
                 addon_utils.view_menu(movies)
             if mode == "letters":
                 addon_utils.view_menu(fa.get_letters())
@@ -51,19 +55,24 @@ def run():
                 addon_utils.view_menu(categories)
             if mode == "plot":
                 desc = fa.get_plot(params["url"][1])
-                info_title = "{0} - {1}".format(addon_utils.name,
-                                                params["title"][0])
+                info_title = "{0} - {1}".format(
+                    addon_utils.name, params["title"][0]
+                )
                 xbmcgui.Dialog().textviewer(info_title, str(desc))
             if mode == "watch":
                 media_url = fa.get_media_url(requests.utils.unquote(url))
-                xbmcplugin.setResolvedUrl(addon_utils.handle, True,
-                    xbmcgui.ListItem(path=media_url))
+                xbmcplugin.setResolvedUrl(
+                    addon_utils.handle, True, xbmcgui.ListItem(path=media_url)
+                )
             if mode == "search":
                 key = params["key"][0] if "key" in params else \
                     keyboard_get_string("", addon_utils.localize(30023))
-                movies = fa.get_url_movies("/sokresultat/?q={0}".format(key),
-                                           mode="search&key={0}".format(key),
-                                           page=page, limit=True)
+                movies = fa.get_url_movies(
+                    "/sokresultat/?q={0}".format(key),
+                    mode="search&key={0}".format(key),
+                    page=page,
+                    limit=True
+                )
                 addon_utils.view_menu(movies)
         except Exception as e:
             addon_utils.show_error(e)

@@ -1,6 +1,8 @@
 import unittest
-import sys, os
-import xbmcaddon, xbmcvfs
+import sys
+import os
+import xbmcaddon
+import xbmcvfs
 addon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 sys.path.append(addon_path)
 from urllib.parse import parse_qs
@@ -14,10 +16,13 @@ class FakeAddonUtils():
         self.name = self.addon.getAddonInfo("name")
         self.id = "plugin.video.filmarkivet"
         self.handle = 0
-        self.profile_dir = xbmcvfs.translatePath(self.addon.getAddonInfo("Profile"))
+        self.profile_dir = xbmcvfs.translatePath(
+            self.addon.getAddonInfo("Profile")
+        )
         self.path = addon_path
-        self.cache_file = xbmcvfs.translatePath(os.path.join(self.profile_dir,
-                                                             "requests_cache"))
+        self.cache_file = xbmcvfs.translatePath(
+            os.path.join(self.profile_dir, "requests_cache")
+        )
 
     def localize(self, *args):
         if len(args) < 1:
@@ -26,7 +31,9 @@ class FakeAddonUtils():
             string_id = args[0]
             return self.addon.getLocalizedString(string_id)
         else:
-            return [self.addon.getLocalizedString(string_id) for string_id in args]
+            return [
+                self.addon.getLocalizedString(string_id) for string_id in args
+            ]
 
     def url_for(self, url):
         return "plugin://{0}{1}".format(self.id, url)
@@ -50,7 +57,6 @@ class TestFilmarkivet(unittest.TestCase):
         except Exception as e:
             error_msg = "{0}; exception caught: {1}".format(error_msg, str(e))
             self.fail(error_msg)
-
         error_msg = "{0}; error: {1}.".format(error_msg, "no categories found")
         self.assertGreater(len(categories), 0, error_msg)
 
@@ -60,21 +66,25 @@ class TestFilmarkivet(unittest.TestCase):
         error_msg = "Possible API change detected for category movies"
         movie_urls = []
         try:
-            for movie_item in self.filmarkivet.get_url_movies(category_url,
-                    mode="category", page=2):
+            for movie_item in self.filmarkivet.get_url_movies(
+                category_url,
+                mode="category",
+                page=2
+            ):
                 item_params = parse_qs(movie_item.url)
                 try:
                     movie_url = item_params["url"][0]
-                except (AttributeError, KeyError, IndexError) as e:
+                except (AttributeError, KeyError, IndexError):
                     continue
-
                 movie_urls.append(movie_url)
         except Exception as e:
             error_msg = "{0}; exception caught: {1}".format(error_msg, str(e))
             self.fail(error_msg)
 
-        error_msg = "{0}; error: {1}.".format(error_msg, "no movies found for" \
-            "the category 'samhälle och politik'.")
+        error_msg = "{0}; error: {1}.".format(
+            error_msg,
+            "no movies found for the category 'samhälle och politik'."
+        )
         self.assertGreater(len(movie_urls), 0, error_msg)
 
     def test_get_themes(self):
@@ -101,7 +111,9 @@ class TestFilmarkivet(unittest.TestCase):
             error_msg = "{0}; exception caught: {1}".format(error_msg, str(e))
             self.fail(error_msg)
 
-        error_msg = "{0}; error: {1}.".format(error_msg, "no theme categories found")
+        error_msg = "{0}; error: {1}.".format(
+            error_msg, "no theme categories found"
+        )
         self.assertGreater(len(theme_categories), 0, error_msg)
 
     def test_get_theme_category_movies(self):
@@ -151,8 +163,10 @@ class TestFilmarkivet(unittest.TestCase):
             error_msg = "{0}; exception caught: {1}".format(error_msg, str(e))
             self.fail(error_msg)
 
-        error_msg = "{0}; error: {1}.".format(error_msg,
-            "urls found ({0}/{1})".format(len(media_urls), len(movie_urls)))
+        error_msg = "{0}; error: {1}.".format(
+            error_msg,
+            "urls found ({0}/{1})".format(len(media_urls), len(movie_urls))
+        )
         self.assertGreater(len(media_urls), 0, error_msg)
 
     def test_search(self):
@@ -173,11 +187,12 @@ class TestFilmarkivet(unittest.TestCase):
                 media_url = item_params["url"][0]
                 if media_url is not None:
                     media_urls.append(media_url)
-            except (AttributeError, KeyError, IndexError) as e:
+            except (AttributeError, KeyError, IndexError):
                 continue
 
-        error_msg = "{0}; error: {1}.".format(error_msg, "no movies found for "
-            "search 'kungar'")
+        error_msg = "{0}; error: {1}.".format(
+            error_msg, "no movies found for search 'kungar'"
+        )
         self.assertGreater(len(media_urls), 0, error_msg)
 
 

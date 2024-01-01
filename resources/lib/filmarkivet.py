@@ -46,8 +46,12 @@ class Filmarkivet():
 
     def get_mainmenu(self):
         for item in self.MAIN_MENU:
-            li = self.ListItem(self.addon_utils.localize(item["title"]),
-                self.addon_utils.url_for("?mode={0}".format(item["mode"])), "", "")
+            li = self.ListItem(
+                self.addon_utils.localize(item["title"]),
+                self.addon_utils.url_for("?mode={0}".format(item["mode"])),
+                "",
+                ""
+            )
             yield li
 
     def mode_url(self, mode):
@@ -62,8 +66,12 @@ class Filmarkivet():
         mode_url = self.mode_url("category")
 
         for item in items[1:]:
-            li = self.ListItem(item.a.string, "{0}&url={1}".format(mode_url,
-                item.a["href"]), "", "")
+            li = self.ListItem(
+                item.a.string,
+                "{0}&url={1}".format(mode_url, item.a["href"]),
+                "",
+                ""
+            )
             yield li
 
     def __get_range(self, soup):
@@ -86,13 +94,7 @@ class Filmarkivet():
             title = category.h2.text
             category_url = "{0}&url={1}".format(mode_url, category.get("href"))
             desc = ""
-            try:
-                category = category.find("img").get("data-lazy-src")
-                category = category.split(",")[-1].replace(" ", "")
-            except AttributeError:
-                category = category.find("img").get("src")
-                category = category.split(",")[-1].replace(" ", "")
-
+            category = category.find("img").get("src")
             img = re.sub(r".jpg.*", ".jpg", category)
             li = self.ListItem(title, category_url, desc, img)
             li.playable = False
@@ -101,8 +103,9 @@ class Filmarkivet():
     def get_url_movies(self, url, mode, page=1, limit=False):
         get_url = url
         if limit:
-            get_url += "{0}limit={1}&pg={2}".format("?" if url.rfind("?") < 0
-                else "&", self.MOVIES_PER_PAGE, page)
+            get_url += "{0}limit={1}&pg={2}".format(
+                "?" if url.rfind("?") < 0 else "&", self.MOVIES_PER_PAGE, page
+            )
         html = self.webget.get_url(get_url)
         soup = BeautifulSoup(html, "html.parser")
         _range, range_max = self.__get_range(soup)
@@ -114,9 +117,13 @@ class Filmarkivet():
             title = "{0} ({1})".format(movie.h3.contents[0].strip(), meta)
             movie_url = "{0}&url={1}".format(
                 mode_url,
-                requests.utils.quote(movie["href"].replace("#038;", "")))
+                requests.utils.quote(movie["href"].replace("#038;", ""))
+            )
             img = movie.figure.img["src"]
-            desc = movie.p.string.strip()
+            try:
+                desc = movie.p.string.strip()
+            except Exception:
+                desc = ""
             li = self.ListItem(title, movie_url, desc, img)
             li.playable = True
             try:
@@ -129,15 +136,22 @@ class Filmarkivet():
             yield li
 
         if _range is not None and _range[1] < range_max:
-            next_url = "{0}&url={1}&page={2}".format(self.mode_url(mode),
-                requests.utils.quote(url), page + 1)
-            li = self.ListItem(self.addon_utils.localize(30001), next_url, None, None)
+            next_url = "{0}&url={1}&page={2}".format(
+                self.mode_url(mode),
+                requests.utils.quote(url),
+                page + 1
+            )
+            li = self.ListItem(
+                self.addon_utils.localize(30001), next_url, None, None
+            )
             yield li
 
     def get_letters(self):
         mode_url = self.mode_url("letter")
         for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ":
-            li = self.ListItem(letter, "{0}&l={1}".format(mode_url, letter), "", "")
+            li = self.ListItem(
+                letter, "{0}&l={1}".format(mode_url, letter), "", ""
+            )
             yield li
 
     def get_letter_movies(self, letter):
@@ -149,8 +163,10 @@ class Filmarkivet():
         mode_url = self.mode_url("watch")
         for movie in movies:
             title = movie.contents[0].strip()
-            url = "{0}&url={1}".format(mode_url,
-                requests.utils.quote(movie["href"]))
+            url = "{0}&url={1}".format(
+                mode_url,
+                requests.utils.quote(movie["href"])
+            )
             li = self.ListItem(title, url, None, None)
             li.playable = True
             yield li
@@ -168,16 +184,23 @@ class Filmarkivet():
         items = lists[1].find_all("li")
         mode_url = self.mode_url("theme")
         for item in items[1:]:
-            li = self.ListItem(item.a.string, "{0}&url={1}".format(
-                mode_url, requests.utils.quote(item.a["href"])),
-                "", "")
+            li = self.ListItem(
+                item.a.string,
+                "{0}&url={1}".format(
+                    mode_url, requests.utils.quote(item.a["href"])
+                ),
+                "",
+                ""
+            )
             yield li
 
     def get_media_url(self, url):
         html = self.webget.get_url(url)
         soup = BeautifulSoup(html, "html.parser")
         media_info = soup.find("div", {"class": "video-container"})
-        media_info = media_info.find("script", {"type": "text/javascript"}).decode()
+        media_info = media_info.find(
+            "script", {"type": "text/javascript"}
+        ).decode()
         media_info = media_info.replace("\t", "")
         media_info = media_info.split("jQuery")[0]
 

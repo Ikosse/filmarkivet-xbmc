@@ -28,13 +28,14 @@ class WebGet(object):
     API_URL = "https://www.filmarkivet.se"
 
     def __init__(self, cache_file):
-        requests_cache.install_cache(cache_file, backend="sqlite", expire_after=604800)
+        requests_cache.install_cache(
+            cache_file, backend="sqlite", expire_after=604800
+        )
 
     def get_url(self, url="/"):
         try:
             if not (url.startswith("http://") or url.startswith("https://")):
                 url = self.API_URL + url
-
             request = session.get(url)
             request.raise_for_status()
             return request.text
